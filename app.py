@@ -100,8 +100,7 @@ if page == "Dashboard":
 
     st.subheader("All Jobs")
 
-    styled_df = filtered_jobs.style.applymap(color_status, subset=["Status"])
-    st.dataframe(styled_df, use_container_width=True)
+    st.dataframe(filtered_jobs, use_container_width=True)
 
     colA, colB = st.columns(2)
 
