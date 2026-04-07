@@ -1,3 +1,6 @@
+import streamlit as st
+import pandas as pd
+
 st.subheader("All Jobs")
 st.dataframe(jobs, use_container_width=True)
 
