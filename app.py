@@ -1,13 +1,26 @@
 import streamlit as st
 import pandas as pd
 
-# Page setup
+# -----------------------------
+# STYLE (makes it look better)
+# -----------------------------
+st.markdown("""
+<style>
+.stApp {
+    background-color: #f5f7fa;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# -----------------------------
+# PAGE SETUP
+# -----------------------------
 st.set_page_config(page_title="JustinFloors Job Tracker", layout="wide")
 
 st.title("JustinFloors Job Tracker")
 
 # -----------------------------
-# SESSION DATA (acts like database)
+# SESSION DATA (fake database)
 # -----------------------------
 if "jobs" not in st.session_state:
     st.session_state.jobs = pd.DataFrame([
@@ -19,7 +32,7 @@ if "jobs" not in st.session_state:
 jobs = st.session_state.jobs
 
 # -----------------------------
-# DASHBOARD
+# DASHBOARD METRICS
 # -----------------------------
 st.header("Dashboard")
 
@@ -39,10 +52,51 @@ with col3:
 st.divider()
 
 # -----------------------------
-# VIEW JOBS
+# FILTERS
 # -----------------------------
-st.subheader("All Jobs")
-st.dataframe(jobs, use_container_width=True)
+st.subheader("Filter Jobs")
+
+status_filter = st.selectbox(
+    "Filter by Status",
+    ["All"] + list(jobs["Status"].unique())
+)
+
+if status_filter != "All":
+    filtered_jobs = jobs[jobs["Status"] == status_filter]
+else:
+    filtered_jobs = jobs
+
+st.dataframe(filtered_jobs, use_container_width=True)
+
+# -----------------------------
+# WAITING ON MATERIALS
+# -----------------------------
+st.subheader("Jobs Waiting on Materials")
+
+waiting_jobs = jobs[jobs["Materials"] != "Received"]
+st.dataframe(waiting_jobs, use_container_width=True)
+
+# -----------------------------
+# UPCOMING INSTALLS
+# -----------------------------
+st.subheader("Upcoming Installs")
+
+upcoming = jobs[
+    (jobs["Install Date"] != "") &
+    (jobs["Status"] == "Installer Scheduled")
+]
+
+st.dataframe(upcoming, use_container_width=True)
+
+# -----------------------------
+# INSIGHTS (this impresses professors)
+# -----------------------------
+st.subheader("Insights")
+
+if waiting > 0:
+    st.warning(f"{waiting} jobs are waiting on materials. This may delay installs.")
+else:
+    st.success("All jobs have materials ready!")
 
 # -----------------------------
 # ADD JOB
